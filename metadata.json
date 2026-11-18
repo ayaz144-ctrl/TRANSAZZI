@@ -1,0 +1,6 @@
+{
+  "name": "Mediterrània Global Logistics & Foreign Trade",
+  "description": "Plataforma web corporativa i d'e-commerce logístic per al comerç exterior: transport marítim multimodal, gestió duanera OEA, emmagatzematge intel·ligent i cotitzacions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -4,11 +4,9 @@ import {
   ShieldCheck,
   Building2,
   CheckCircle2,
-  FileSearch,
+  Package,
   Truck,
-  Sparkles,
   ArrowRight,
-  Layers,
   Activity,
   Zap
 } from 'lucide-react';
@@ -20,121 +18,93 @@ interface CustomsSimulatorProps {
 export const CustomsSimulatorSection: React.FC<CustomsSimulatorProps> = ({
   onOpenQuoteModal
 }) => {
-  // Simulator input state
-  const [cargoCategory, setCargoCategory] = useState<'general' | 'perishable' | 'chemical' | 'electronics' | 'textile'>('general');
-  const [portTerminal, setPortTerminal] = useState<'best' | 'apm' | 'valencia' | 'zal'>('best');
-  const [hasOEA, setHasOEA] = useState<boolean>(true);
-  const [trafficLevel, setTrafficLevel] = useState<'fluid' | 'moderate' | 'congested'>('fluid');
-  const [preArrivalFiling, setPreArrivalFiling] = useState<boolean>(true);
+  const [garmentCategory, setGarmentCategory] = useState<'vestits' | 'traje_home' | 'traje_dona' | 'complements' | 'bespoke'>('vestits');
+  const [dispatchZone, setDispatchZone] = useState<'catalunya' | 'espanya' | 'europa' | 'internacional'>('catalunya');
+  const [expressPriority, setExpressPriority] = useState<boolean>(true);
+  const [seasonDemand, setSeasonDemand] = useState<'fluid' | 'moderate' | 'peak'>('fluid');
+  const [preClearedDocs, setPreClearedDocs] = useState<boolean>(true);
 
-  // Calculation logic for customs clearance channel and estimated release time
-  const calculateCustomsEstimate = () => {
-    // Determine typical channel based on cargo type and OEA status
-    let channel: 'verd' | 'groc' | 'taronja' | 'vermell' = 'verd';
-    let probabilityGreen = hasOEA ? 88 : 55;
+  const calculateDeliveryEstimate = () => {
+    let channel: 'verd' | 'groc' | 'taronja' = 'verd';
 
-    if (cargoCategory === 'perishable') {
-      channel = hasOEA ? 'groc' : 'vermell';
-    } else if (cargoCategory === 'chemical') {
-      channel = hasOEA ? 'taronja' : 'vermell';
-    } else if (cargoCategory === 'electronics') {
-      channel = hasOEA ? 'verd' : 'taronja';
-    } else if (cargoCategory === 'textile') {
-      channel = hasOEA ? 'verd' : 'taronja';
+    if (dispatchZone === 'internacional') {
+      channel = preClearedDocs && expressPriority ? 'groc' : 'taronja';
+    } else if (garmentCategory === 'bespoke') {
+      channel = expressPriority ? 'verd' : 'groc';
     } else {
-      channel = hasOEA ? 'verd' : 'groc';
+      channel = 'verd';
     }
 
-    // Base time in minutes
-    let minutesBase = 35; // Canal verd OEA standard
+    let hoursBase = 12;
 
-    if (channel === 'verd') {
-      minutesBase = hasOEA ? (preArrivalFiling ? 25 : 45) : 90;
-    } else if (channel === 'groc') {
-      minutesBase = hasOEA ? (preArrivalFiling ? 120 : 180) : 360;
-    } else if (channel === 'taronja') {
-      minutesBase = hasOEA ? (preArrivalFiling ? 150 : 240) : 420;
-    } else if (channel === 'vermell') {
-      minutesBase = hasOEA ? (preArrivalFiling ? 480 : 720) : 1200;
+    if (dispatchZone === 'catalunya') {
+      hoursBase = expressPriority ? 8 : 24;
+    } else if (dispatchZone === 'espanya') {
+      hoursBase = expressPriority ? 24 : 48;
+    } else if (dispatchZone === 'europa') {
+      hoursBase = expressPriority ? 36 : 72;
+    } else {
+      hoursBase = expressPriority ? (preClearedDocs ? 64 : 96) : 120;
     }
 
-    // Terminal multiplier
-    let terminalMultiplier = 1.0;
-    if (portTerminal === 'best') terminalMultiplier = 0.95; // High automation
-    if (portTerminal === 'apm') terminalMultiplier = 1.0;
-    if (portTerminal === 'valencia') terminalMultiplier = 1.05;
-    if (portTerminal === 'zal') terminalMultiplier = 0.85; // Direct TransAzzi warehouse
+    if (garmentCategory === 'bespoke') {
+      hoursBase += 24; // Custom hand-basted fitting adjustments
+    }
 
-    // Traffic congestion multiplier
-    let trafficMultiplier = 1.0;
-    if (trafficLevel === 'fluid') trafficMultiplier = 1.0;
-    if (trafficLevel === 'moderate') trafficMultiplier = 1.35;
-    if (trafficLevel === 'congested') trafficMultiplier = 1.8;
+    let demandMultiplier = 1.0;
+    if (seasonDemand === 'fluid') demandMultiplier = 1.0;
+    if (seasonDemand === 'moderate') demandMultiplier = 1.15;
+    if (seasonDemand === 'peak') demandMultiplier = 1.3;
 
-    const totalMinutes = Math.round(minutesBase * terminalMultiplier * trafficMultiplier);
+    const totalHours = Math.round(hoursBase * demandMultiplier);
+    const standardHours = Math.round(totalHours * 1.9);
+    const savedHours = Math.max(6, standardHours - totalHours);
 
-    // Non-OEA comparison time
-    const nonOEAMinutes = Math.round(totalMinutes * 2.6);
-    const savedMinutes = Math.max(0, nonOEAMinutes - totalMinutes);
-
-    // Human readable duration formatting
-    const formatDuration = (mins: number) => {
-      if (mins < 60) {
-        return `${mins} minuts`;
+    const formatDuration = (hrs: number) => {
+      if (hrs < 24) {
+        return `${hrs} hores`;
       }
-      const h = Math.floor(mins / 60);
-      const m = mins % 60;
-      return m > 0 ? `${h}h ${m}min` : `${h} hores`;
+      const days = Math.floor(hrs / 24);
+      const remH = hrs % 24;
+      if (remH === 0) return `${days} ${days === 1 ? 'dia' : 'dies'} (${hrs}h)`;
+      return `${days}d ${remH}h (${hrs} hores)`;
     };
 
     return {
       channel,
-      probabilityGreen,
-      totalMinutes,
-      formattedTime: formatDuration(totalMinutes),
-      savedTimeFormatted: formatDuration(savedMinutes),
+      totalHours,
+      formattedTime: formatDuration(totalHours),
+      savedTimeFormatted: `${savedHours} hores`,
       channelLabel:
         channel === 'verd'
-          ? 'Canal Verd (Llevant Immediat)'
+          ? 'Canal Verd VIP · Sortida Immediata en Porta-Trajes'
           : channel === 'groc'
-          ? 'Canal Groc (Control Paraduaner / Certificats)'
-          : channel === 'taronja'
-          ? 'Canal Taronja (Revisió Documental Aranzelària)'
-          : 'Canal Vermell (Inspecció Física PIF / Escàner)',
+          ? 'Despatx Preferent de Seda i Llana d’Exportació'
+          : 'Control Duaner Internacional Estàndard',
       channelDesc:
         channel === 'verd'
-          ? 'Mercaderia despatxada automàticament per l’Agència Tributària sense requeriments addicionals. Camions TransAzzi llestos per a recollida immediata.'
+          ? 'La teva peça es vaporitza a mà, es col·loca en perxa de cedre dins la funda de lli i surt directament cap al teu domicili.'
           : channel === 'groc'
-          ? 'Revisió de certificats sanitaris, SOIVRE o fitosanitaris per part dels organismes paraduaners abans d’emetre el llevant.'
-          : channel === 'taronja'
-          ? 'Comprovació de valor en duana, factura comercial i declaració de valor abans d’autoritzar la sortida.'
-          : 'Obertura del contenidor al Punt d’Inspecció Fronterera (PIF) o pas per escàner mòbil de la terminal.',
-      channelColor:
-        channel === 'verd'
-          ? 'emerald'
-          : channel === 'groc'
-          ? 'amber'
-          : channel === 'taronja'
-          ? 'orange'
-          : 'rose'
+          ? 'Validació prioritària de certificats de pell i teixit italià abans de creuar la duana cap a Londres, Ginebra o Mònaco.'
+          : 'Tramitació aranzelària d’alta costura fora de la UE amb factura consular i assegurança a tot risc.',
+      customsClearanceMinutes: expressPriority ? '20 minuts' : '3 hores'
     };
   };
 
-  const estimate = calculateCustomsEstimate();
+  const estimate = calculateDeliveryEstimate();
 
-  // Terminal names display
-  const getTerminalLabel = (t: string) => {
-    switch (t) {
-      case 'best':
-        return 'Terminal BEST (Port de Barcelona - Moll Prat)';
-      case 'apm':
-        return 'Terminal APM (Port de Barcelona)';
-      case 'valencia':
-        return 'Terminal CSP (Port de València)';
-      case 'zal':
-        return 'Dipòsit Franc TransAzzi (Zona Franca Barcelona)';
+  const getZoneLabel = (z: string) => {
+    switch (z) {
+      case 'catalunya':
+        return 'Barcelona & Catalunya (Chauffeur Atelier)';
+      case 'espanya':
+        return 'Madrid, Marbella, València & Espanya';
+      case 'europa':
+        return 'París, Milà, Mònaco & Unió Europea';
+      case 'internacional':
+        return 'Suïssa, Regne Unit & Nova York';
       default:
-        return 'Terminal Portuària';
+        return 'Enviament VIP';
     }
   };
 
@@ -143,75 +113,71 @@ export const CustomsSimulatorSection: React.FC<CustomsSimulatorProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-12 text-left">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-pink-600 mb-2">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-pink-600 mb-2">
             <Activity className="w-4 h-4" />
-            <span>Monitoratge en Temps Real & Intel·ligència Duanera</span>
+            <span>Servei de Guant Blanc &amp; Duana Preferent</span>
             <span aria-hidden="true" className="text-pink-300">/</span>
-            <span>TRANSAZZI OEA</span>
+            <span>TRANSAZZI CONCIERGE</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight text-balance">
-            Simulador de Despatx Duaner i Temps de Llevant
+          <h2 className="font-serif-luxury text-3xl sm:text-4xl lg:text-5xl font-semibold text-slate-900 tracking-tight text-balance">
+            Simulador de Preparació d&apos;Atelier i Temps de Duana VIP
           </h2>
           <p className="mt-3 text-base text-slate-600 leading-relaxed">
-            Comprova com està la duana i calcula el temps exacte que trigarà la teva mercaderia a rebre el llevant i sortir de la terminal portuària cap al camió de repartiment.
+            Comprova l&apos;estat de les sortides i la duana internacional per calcular en quantes hores rebràs el teu vestit o traje impecable a casa.
           </p>
         </div>
 
-        {/* Live Port Status Bar */}
+        {/* Live Status Bar */}
         <div className="mb-10 bg-pink-50/60 p-4 rounded-2xl border border-pink-200/90 flex flex-wrap items-center justify-between gap-4 text-xs">
           <div className="flex items-center gap-2.5 text-slate-800">
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-pink-600"></span>
-            </span>
-            <span className="font-bold text-slate-900">Estat Operatiu de la Duana Port de Barcelona:</span>
-            <span className="text-pink-700 font-semibold bg-white px-2 py-0.5 rounded border border-pink-200">
-              Connexió EDI AEAT Activa (Canal Verd Fluït)
+            <span className="font-bold text-slate-900">Estat Actual Atelier &amp; Duana Internacional:</span>
+            <span className="text-pink-700 font-semibold bg-white px-2.5 py-0.5 rounded border border-pink-200">
+              Canal Verd VIP Actiu (Sortides sense demora)
             </span>
           </div>
 
           <div className="flex flex-wrap items-center gap-4 text-slate-600">
             <div>
-              Temps mitjà canal verd: <strong className="text-slate-900 font-mono">28 min</strong>
+              Vaporitzat i funda rígid: <strong className="text-slate-900 font-mono">40 min</strong>
             </div>
             <div className="hidden sm:block text-slate-300">|</div>
             <div>
-              Trànsits OEA TransAzzi prioritaris: <strong className="text-pink-600 font-mono font-bold">96,4%</strong>
+              Lliuraments VIP puntuals: <strong className="text-pink-600 font-mono font-bold">99,6%</strong>
             </div>
           </div>
         </div>
 
         {/* Simulator Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Controls Column (7 cols) */}
+          {/* Controls Column */}
           <div className="lg:col-span-7 bg-white rounded-2xl border border-pink-200 p-6 sm:p-8 shadow-xs text-left space-y-6">
             <div className="flex items-center justify-between border-b border-pink-100 pb-4">
               <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
-                <FileSearch className="w-4 h-4 text-pink-600" />
-                <span>Paràmetres de la teva Mercaderia</span>
+                <Package className="w-4 h-4 text-pink-600" />
+                <span>Paràmetres de la teva Peça d&apos;Alta Moda</span>
               </div>
-              <span className="text-xs text-slate-500">Ajusta les opcions per recalcular</span>
+              <span className="text-xs text-slate-500">Càlcul en directe</span>
             </div>
 
-            {/* 1. Tipus de Mercaderia */}
+            {/* 1. Tipus de Peça */}
             <div>
               <label className="block text-xs font-semibold text-slate-800 mb-2">
-                1. Tipologia de la Mercaderia / Sector
+                1. Tipus de Vestit, Traje o Complement
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {[
-                  { id: 'general', label: 'Càrrega General / Industrial', sub: 'Maquinària, metall, recanvis' },
-                  { id: 'perishable', label: 'Alimentació / Peribles (Reefer)', sub: 'Inspecció Sanitària / Fito' },
-                  { id: 'chemical', label: 'Química / Cosmètica / Farma', sub: 'Control farmacèutic / SOIVRE' },
-                  { id: 'electronics', label: 'Electrònica & Tecnologia', sub: 'Bateries de liti / CE' },
-                  { id: 'textile', label: 'Tèxtil / Calçat / Moda', sub: 'Control d’origen i aranzelari' }
+                  { id: 'vestits', label: 'Vestit de Gala / Seda Pura', sub: 'Transport penjat sense plegats' },
+                  { id: 'traje_home', label: 'Traje Creuat Home Super 150s', sub: 'Porta-trajes rígid + cedre' },
+                  { id: 'traje_dona', label: 'Traje Sastre Dona & Blazer', sub: 'Caixmir i seda vaporitzats' },
+                  { id: 'complements', label: 'Bossa Pell & Mocador Cashmere', sub: 'Cofre rígid amb llaç rosa' },
+                  { id: 'bespoke', label: 'Ajust Bespoke / Arranjament Sastre', sub: 'Personalitzat a les teves mides' }
                 ].map((item) => (
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => setCargoCategory(item.id as any)}
+                    onClick={() => setGarmentCategory(item.id as 'vestits' | 'traje_home' | 'traje_dona' | 'complements' | 'bespoke')}
                     className={`p-3 rounded-xl border text-left transition-all ${
-                      cargoCategory === item.id
+                      garmentCategory === item.id
                         ? 'bg-pink-50 border-pink-600 text-slate-900 ring-2 ring-pink-500/20 shadow-xs'
                         : 'bg-white border-slate-200 hover:border-pink-300 text-slate-700'
                     }`}
@@ -223,34 +189,34 @@ export const CustomsSimulatorSection: React.FC<CustomsSimulatorProps> = ({
               </div>
             </div>
 
-            {/* 2. Terminal Portuària */}
+            {/* 2. Zona de Destí */}
             <div>
               <label className="block text-xs font-semibold text-slate-800 mb-2">
-                2. Terminal Portuària d'Atracament i Descàrrega
+                2. Destí del Lliurament VIP des de Barcelona
               </label>
               <select
-                value={portTerminal}
-                onChange={(e) => setPortTerminal(e.target.value as any)}
+                value={dispatchZone}
+                onChange={(e) => setDispatchZone(e.target.value as 'catalunya' | 'espanya' | 'europa' | 'internacional')}
                 className="w-full px-3.5 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-pink-500 text-slate-900 bg-white"
               >
-                <option value="best">Terminal BEST (Port de Barcelona - Moll Prat) [Semi-automatitzada]</option>
-                <option value="apm">Terminal APM (Port de Barcelona)</option>
-                <option value="valencia">Terminal CSP (Port de València)</option>
-                <option value="zal">Dipòsit Franc TransAzzi (Zona Franca de Barcelona)</option>
+                <option value="catalunya">Barcelona &amp; Catalunya (Repartiment privat en el dia)</option>
+                <option value="espanya">Madrid (Salamanca), Marbella i València</option>
+                <option value="europa">París, Milà, Mònaco &amp; Europa UE</option>
+                <option value="internacional">Suïssa (Ginebra/Zúric), Londres &amp; Internacional</option>
               </select>
             </div>
 
-            {/* 3. Estatus OEA TransAzzi */}
+            {/* 3. Servei Concierge Express */}
             <div className="bg-pink-50/70 p-4 rounded-xl border border-pink-200">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-start gap-2.5">
                   <ShieldCheck className="w-5 h-5 text-pink-600 shrink-0 mt-0.5" />
                   <div>
                     <span className="text-xs font-bold text-slate-900 block">
-                      Aplicar Certificació OEA de TRANSAZZI
+                      Prioritat Concierge &amp; Guant Blanc TRANSAZZI
                     </span>
                     <span className="text-[11px] text-slate-600 block">
-                      Operador Econòmic Autoritzat: menys controls físics, despatx documental preferent i carril ràpid.
+                      Recollida prioritària a l&apos;atelier, vehicle climatitzat vertical i tràmit duaner preferent.
                     </span>
                   </div>
                 </div>
@@ -258,8 +224,8 @@ export const CustomsSimulatorSection: React.FC<CustomsSimulatorProps> = ({
                 <label className="relative inline-flex items-center cursor-pointer shrink-0">
                   <input
                     type="checkbox"
-                    checked={hasOEA}
-                    onChange={(e) => setHasOEA(e.target.checked)}
+                    checked={expressPriority}
+                    onChange={(e) => setExpressPriority(e.target.checked)}
                     className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-slate-300 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-600"></div>
@@ -267,89 +233,71 @@ export const CustomsSimulatorSection: React.FC<CustomsSimulatorProps> = ({
               </div>
             </div>
 
-            {/* 4. Congestió i Pre-declaració */}
+            {/* 4. Temporada i documentació */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-800 mb-1.5">
-                  Congestió de Trànsit a les Portes del Port
+                  Demanda a l&apos;Atelier
                 </label>
                 <select
-                  value={trafficLevel}
-                  onChange={(e) => setTrafficLevel(e.target.value as any)}
+                  value={seasonDemand}
+                  onChange={(e) => setSeasonDemand(e.target.value as 'fluid' | 'moderate' | 'peak')}
                   className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-pink-500 bg-white text-slate-800"
                 >
-                  <option value="fluid">Trànsit Normal / Fluid (Cua &lt; 15 min)</option>
-                  <option value="moderate">Moderat (Arribada simultània de vaixells)</option>
-                  <option value="congested">Alta Congestió (Temps addicional d'espera)</option>
+                  <option value="fluid">Servei Fluït (Lliurament immediat)</option>
+                  <option value="moderate">Temporada d&apos;Esdeveniments &amp; Bodes</option>
+                  <option value="peak">Alta Temporada de Gala / Nadal</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-slate-800 mb-1.5">
-                  Presentació Telemàtica Anticipada DUA
+                  Certificats CITES / Origen Pre-validats
                 </label>
                 <select
-                  value={preArrivalFiling ? 'yes' : 'no'}
-                  onChange={(e) => setPreArrivalFiling(e.target.value === 'yes')}
+                  value={preClearedDocs ? 'yes' : 'no'}
+                  onChange={(e) => setPreClearedDocs(e.target.value === 'yes')}
                   className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-pink-500 bg-white text-slate-800"
                 >
-                  <option value="yes">Sí - Pre-DUA presentat abans d'atracar</option>
-                  <option value="no">No - Presentació després de la descàrrega</option>
+                  <option value="yes">Sí - Documentació de luxe telemàtica</option>
+                  <option value="no">No - Revisió física en frontera</option>
                 </select>
               </div>
             </div>
           </div>
 
-          {/* Results Column: Estimated Release & Circuit Output (5 cols) */}
+          {/* Results Column */}
           <div className="lg:col-span-5 space-y-6 text-left">
-            {/* Primary Result Card */}
             <div className="bg-slate-950 text-white rounded-2xl p-6 sm:p-7 border border-pink-900/40 shadow-xl relative overflow-hidden">
               <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
                 <span className="text-[11px] font-mono text-pink-300 uppercase tracking-wider">
-                  PREVISIÓ DE LLEVANT DUANER
+                  ESTIMACIÓ DE LLIURAMENT VIP
                 </span>
                 <span className="text-xs text-slate-400 font-mono">
                   {new Date().toLocaleDateString('ca-ES')}
                 </span>
               </div>
 
-              {/* Huge Time Metric */}
               <div className="mb-4">
                 <span className="text-xs text-slate-400 block mb-1">
-                  Temps estimat fins a la sortida de la mercaderia:
+                  Temps total fins a rebre la peça impecable:
                 </span>
-                <div className="text-3xl sm:text-4xl font-extrabold font-mono text-pink-400 tracking-tight flex items-baseline gap-2">
+                <div className="text-3xl sm:text-4xl font-extrabold font-mono tabular-nums text-pink-400 tracking-tight flex items-baseline gap-2">
                   <span>{estimate.formattedTime}</span>
-                  <span className="text-xs font-sans text-slate-300 font-normal">
-                    (des de l'atracament)
-                  </span>
                 </div>
               </div>
 
-              {/* Channel badge box */}
               <div
                 className={`p-3.5 rounded-xl border mb-5 ${
                   estimate.channel === 'verd'
                     ? 'bg-emerald-950/70 border-emerald-500/40 text-emerald-200'
                     : estimate.channel === 'groc'
                     ? 'bg-amber-950/70 border-amber-500/40 text-amber-200'
-                    : estimate.channel === 'taronja'
-                    ? 'bg-orange-950/70 border-orange-500/40 text-orange-200'
-                    : 'bg-rose-950/70 border-rose-500/40 text-rose-200'
+                    : 'bg-orange-950/70 border-orange-500/40 text-orange-200'
                 }`}
               >
                 <div className="flex items-center gap-2 font-bold text-xs mb-1">
-                  <span
-                    className={`w-2.5 h-2.5 rounded-full ${
-                      estimate.channel === 'verd'
-                        ? 'bg-emerald-400'
-                        : estimate.channel === 'groc'
-                        ? 'bg-amber-400'
-                        : estimate.channel === 'taronja'
-                        ? 'bg-orange-400'
-                        : 'bg-rose-400'
-                    }`}
-                  />
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
                   <span>{estimate.channelLabel}</span>
                 </div>
                 <p className="text-[11px] leading-relaxed opacity-90">
@@ -357,72 +305,68 @@ export const CustomsSimulatorSection: React.FC<CustomsSimulatorProps> = ({
                 </p>
               </div>
 
-              {/* OEA Savings Callout */}
-              {hasOEA && (
+              {expressPriority && (
                 <div className="bg-pink-900/30 border border-pink-700/50 rounded-xl p-3 mb-5 flex items-start gap-2.5">
                   <Zap className="w-4 h-4 text-pink-400 shrink-0 mt-0.5" />
                   <div className="text-xs">
                     <span className="font-bold text-white block">
-                      Estalvi amb TRANSAZZI OEA:
+                      Avantatge Servei Concierge:
                     </span>
                     <span className="text-pink-300">
-                      Estalvies aproximadament <strong>{estimate.savedTimeFormatted}</strong> en comparació amb un despatx convencional sense OEA.
+                      Guanyes <strong>{estimate.savedTimeFormatted}</strong> respecte d&apos;un enviament convencional sense protecció vertical.
                     </span>
                   </div>
                 </div>
               )}
 
-              {/* Stepper Timeline */}
               <div className="space-y-3 pt-3 border-t border-slate-800 text-xs">
                 <div className="flex items-start gap-2.5 text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-semibold text-white">1. Presentació Sumària i DUA telemàtic</span>
-                    <div className="text-[11px] text-slate-400">Connexió directa amb la Seu Electrònica de l'AEAT</div>
+                    <span className="font-semibold text-white">1. Vaporitzat &amp; Perxa de Cedre</span>
+                    <div className="text-[11px] text-slate-400">Atelier Passeig de Gràcia, Barcelona</div>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-2.5 text-slate-300">
                   <Clock className="w-4 h-4 text-pink-400 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-semibold text-white">2. Resolució del Circuit i Llevant</span>
-                    <div className="text-[11px] text-slate-400">Temps estimat: {estimate.formattedTime}</div>
+                    <span className="font-semibold text-white">2. Pas per Duana / Verificació</span>
+                    <div className="text-[11px] text-slate-400">Resolució estimada: {estimate.customsClearanceMinutes}</div>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-2.5 text-slate-300">
                   <Truck className="w-4 h-4 text-pink-400 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-semibold text-white">3. Carrega al camió TransAzzi</span>
-                    <div className="text-[11px] text-slate-400">Retirada a terminal en &lt; 35 minuts d'obtenir el llevant</div>
+                    <span className="font-semibold text-white">3. Entrega en Mà a Domicili o Hotel</span>
+                    <div className="text-[11px] text-slate-400">Termini total: {estimate.formattedTime}</div>
                   </div>
                 </div>
               </div>
 
-              {/* CTA Inside the simulator */}
               <div className="mt-6 pt-4 border-t border-slate-800">
                 <button
                   onClick={() =>
                     onOpenQuoteModal(
-                      `Simulació Duana: ${estimate.channelLabel} (${getTerminalLabel(portTerminal)}) - Temps Estimat: ${estimate.formattedTime}`
+                      `Enviament VIP (${getZoneLabel(dispatchZone)}) - Lliurament: ${estimate.formattedTime}`
                     )
                   }
                   className="w-full flex items-center justify-center gap-2 py-3 px-4 text-xs font-semibold text-white bg-pink-600 hover:bg-pink-500 rounded-xl shadow-md shadow-pink-600/30 transition-all"
                 >
-                  <span>Sol·licitar Despatx Duaner Urgent</span>
+                  <span>Sol·licitar Enviament VIP Ara</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            {/* Quality Guarantee Box */}
             <div className="bg-pink-50/70 p-4 rounded-xl border border-pink-200 text-xs text-slate-700">
               <div className="flex items-center gap-2 font-bold text-slate-900 mb-1">
                 <Building2 className="w-4 h-4 text-pink-600" />
-                <span>Oficina Duanera TransAzzi a Zona Franca</span>
+                <span>Garantia de Vestuari Sense Arrugues</span>
               </div>
               <p className="text-[11px] leading-relaxed text-slate-600">
-                Agents de duana col·legiats propis de guàrdia 24/7/365 per resoldre incidències documentals, sol·licitar canals verds i evitar costos de demorres i ocupacions portuàries.
+                Tots els vestits llargs i trajes creuats s&apos;envien assegurats a tot risc i penjats en vehicles climatitzats perquè arribin directes per a l&apos;esdeveniment.
               </p>
             </div>
           </div>

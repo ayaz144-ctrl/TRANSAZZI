@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
 import {
   MapPin,
-  Anchor,
+  Crown,
   Truck,
-  Ship,
-  Warehouse,
   CheckCircle2,
   Clock,
   ArrowRight,
   Globe,
   Navigation,
-  Compass,
-  Layers
+  Compass
 } from 'lucide-react';
 
 export interface OperationalPoint {
@@ -21,8 +18,8 @@ export interface OperationalPoint {
   country: string;
   category: 'peninsula' | 'europe' | 'global';
   typeLabel: string;
-  x: number; // Percentage 0-100 on SVG map
-  y: number; // Percentage 0-100 on SVG map
+  x: number;
+  y: number;
   location: string;
   transitTime: string;
   facilities: string[];
@@ -34,214 +31,214 @@ export interface OperationalPoint {
 const OPERATIONAL_POINTS: OperationalPoint[] = [
   {
     id: 'bcn',
-    name: 'Barcelona (Quarter General & Hub Central)',
+    name: 'Barcelona (Atelier Central & Salon Privé)',
     city: 'Barcelona',
     country: 'Catalunya / Espanya',
     category: 'peninsula',
-    typeLabel: 'Seu Corporativa & Hub Marítim',
+    typeLabel: 'Maison Central & Sastreria',
     x: 62,
     y: 58,
     isHQ: true,
-    location: 'Zona Franca Portuària, Sector 3 / Terminal BEST Moll Prat / ZAL',
-    transitTime: '< 35 minuts des de l’atracament del vaixell',
+    location: 'Passeig de Gràcia 84, Principal / Eixample',
+    transitTime: 'Lliurament Concierge el mateix dia (< 4h)',
     facilities: [
-      'Magatzem duaner DDA / DA de 45.000 m²',
-      'Accés directe a terminals BEST i APM Port de Barcelona',
-      'Connexió ferroviària d’ample internacional UIC',
-      'Despatx OEA canal verd immediat 24/7'
+      'Salon privat de proves per a vestits de gala i trajes a mida',
+      'Mestres sastres i modistes d’alta costura propis',
+      'Preparació en porta-trajes rígid amb perxa de cedre',
+      'Sortides diàries en flota climatitzada cap a tot Europa'
     ],
-    equipment: 'Flota pròpia de tractors Scania Euro 6 i xassissos extensibles',
-    description: 'El cor de la nostra operativa. Des d’aquí gestionem la tracció portuària contínua, la recollida de contenidors i la distribució terrestre urgent.'
-  },
-  {
-    id: 'valencia',
-    name: 'Port de València (Hub Llevant)',
-    city: 'València',
-    country: 'Espanya',
-    category: 'peninsula',
-    typeLabel: 'Terminal Marítima de Contenidors',
-    x: 58,
-    y: 69,
-    location: 'Terminal CSP Iberian Valencia Terminal / Moll de la Xina',
-    transitTime: 'Lliurament en menys de 24 hores',
-    facilities: [
-      'Connexió directe amb línies transoceàniques',
-      'Plataforma frigorífica Reefer amb connexió elèctrica Genset',
-      'Inspecció sanitària i fitosanitària ràpida'
-    ],
-    equipment: 'Semiremolcs refrigerats i porta-contenidors de 20’ i 40’',
-    description: 'Especialitzat en tràfics transoceànics, fruita, cítrics i agroalimentari amb contenidors Reefer d’última generació.'
+    equipment: 'Vehicles privats condicionats per a peces llargues penjades',
+    description: 'El cor de Maison TRANSAZZI. Des d’aquí dissenyem, ajustem i enviem cada vestit de seda i traje Super 150s.'
   },
   {
     id: 'madrid',
-    name: 'Madrid (Port Sec de Coslada)',
+    name: 'Madrid (Showroom Salamanca)',
     city: 'Madrid',
     country: 'Espanya',
     category: 'peninsula',
-    typeLabel: 'Port Sec & Plataforma Intermodal',
+    typeLabel: 'Salon Privé & Entrega Guant Blanc',
     x: 46,
     y: 64,
-    location: 'Centro de Transportes de Coslada / Terminal Intermodal',
-    transitTime: 'Connexió ferroviària diària 12h / Terrestre 6h',
+    location: 'Carrer de Serrano / Barri de Salamanca',
+    transitTime: 'Lliurament en 24 hores',
     facilities: [
-      'Connexió ferroviària directa diària des del Port de Barcelona',
-      'Dipòsit regulador de contenidors buits i plens',
-      'Distribució just-in-time per a la zona centre'
+      'Presa de mides bespoke i proves privades amb cita prèvia',
+      'Reposició urgent de vestits i trajes per a cerimònies',
+      'Servei d’entrega directa a domicili o hotel'
     ],
-    equipment: 'Llançadores de carretera i servei ferro-portuari multimodal',
-    description: 'Pont logístic central que connecta el port marítim amb les plataformes industrials i de comerç electrònic de la península.'
+    equipment: 'Missatgeria privada vertical de guant blanc',
+    description: 'El nostre salon madrileny per a clients que busquen sastreria italiana i vestits d’alta costura amb entrega immediata.'
+  },
+  {
+    id: 'valencia',
+    name: 'València (Salon Eixample)',
+    city: 'València',
+    country: 'Espanya',
+    category: 'peninsula',
+    typeLabel: 'Boutique & Concierge Llevant',
+    x: 58,
+    y: 69,
+    location: 'Carrer de Colón / Plaça de los Pinazo',
+    transitTime: 'Lliurament en menys de 24 hores',
+    facilities: [
+      'Col·lecció completa de vestits de seda per a esdeveniments',
+      'Sastreria d’home en llanes fresques i lli irlandès',
+      'Recollida i canvi de talla a domicili gratuït'
+    ],
+    equipment: 'Ruta directa Mediterrània en porta-trajes',
+    description: 'Elegància atemporal per a cerimònies, nits d’estiu i armari executiu a tot el Llevant.'
   },
   {
     id: 'tarragona',
-    name: 'Tarragona (Pol Químic & Portuari)',
+    name: 'Tarragona & Costa Daurada',
     city: 'Tarragona',
     country: 'Catalunya',
     category: 'peninsula',
-    typeLabel: 'Pol Químic & Granel Industrial',
+    typeLabel: 'Ruta Directa Atelier',
     x: 59,
     y: 61,
-    location: 'Port de Tarragona / Polígon Petroquímic',
-    transitTime: 'Lliurament mateix dia (< 2 hores)',
+    location: 'Rambla Nova / Lliurament Privat',
+    transitTime: 'Entrega mateix dia o 24h',
     facilities: [
-      'Transport autoritzat de mercaderies perilloses ADR',
-      'Custòdia i manipulació especialitzada de tancs ISO',
-      'Accés directe a la xarxa d’autopistes AP-7 i A-27'
+      'Enviament directe des de Passeig de Gràcia en el dia',
+      'Ajustament de baixos de pantaló i vestits',
+      'Embalatge VIP amb targeta cal·ligràfica'
     ],
-    equipment: 'Caps tractors amb tallacorrents antiespurna i cisternes ADR',
-    description: 'Cobertura directa per a la indústria química, matèries primeres, adobs i granels industrials.'
+    equipment: 'Furgoneta privada TransAzzi Catalunya',
+    description: 'Servei prioritari per a clients particulars de Tarragona, Reus i Sitges.'
   },
   {
-    id: 'zaragoza',
-    name: 'Saragossa (Plataforma Logística PLAZA)',
-    city: 'Saragossa',
+    id: 'marbella',
+    name: 'Marbella & Sotogrande (Hub Sud)',
+    city: 'Marbella',
     country: 'Espanya',
     category: 'peninsula',
-    typeLabel: 'Hub Logístic Terrestre',
-    x: 54,
-    y: 53,
-    location: 'PLAZA (Plataforma Logística de Zaragoza)',
-    transitTime: '4 hores des de la terminal marítima',
+    typeLabel: 'Boutique Estiu & Gala',
+    x: 37,
+    y: 83,
+    location: 'Milla d’Or de Marbella / Puerto Banús',
+    transitTime: 'Lliurament VIP en 24/48h',
     facilities: [
-      'Node estratègic de connexió amb el corredor nord i vall de l’Ebre',
-      'Cross-docking i consolidació de càrregues',
-      'Terminal ferroviària de contenidors marítims'
+      'Selecció de vestits de seda fluida, lli i americanes creuades',
+      'Entrega directa en vil·les privades, clubs nàutics i hotels',
+      'Servei d’estilisme per a gales benèfiques i bodes'
     ],
-    equipment: 'Tractors d’alta capacitat Euro 6',
-    description: 'Enllaç clau per a la indústria manufacturera, paperera i d’automoció de l’eix de l’Ebre.'
+    equipment: 'Transport climatitzat vertical sense arrugues',
+    description: 'Vestuari de màxim nivell i entrega discreta a la Costa del Sol.'
   },
   {
     id: 'bilbao',
-    name: 'Bilbao (Port de Bilbao & Corredor Cantàbric)',
+    name: 'Bilbao & Sant Sebastià',
     city: 'Bilbao',
     country: 'Espanya',
     category: 'peninsula',
-    typeLabel: 'Terminal Marítima Cantàbrica',
+    typeLabel: 'Sastreria Nord',
     x: 48,
     y: 44,
-    location: 'Port de Bilbao (Moll de Santurtzi)',
+    location: 'Gran Vía Bilbao / Àrea Metropolitana',
     transitTime: 'Lliurament en 24h',
     facilities: [
-      'Connexió directa amb rutes del Mar del Nord i Regne Unit',
-      'Especialistes en càrrega de projecte i gran tonatge',
-      'Magatzem de trànsit autoritzat'
+      'Abrics double-face de caixmir i trajes tres peces',
+      'Protecció impermeabilitzada en cada porta-trajes',
+      'Assessorament de mesures a distància'
     ],
-    equipment: 'Góndoles baixes i equips per a maquinària pesada',
-    description: 'Sortida marítima cap al nord d’Europa i eix atlàntic per a la indústria siderúrgica i pesada.'
+    equipment: 'Flota express amb funda antihumitat',
+    description: 'Sastreria clàssica de llana Super 150s i abrics nobles per al nord peninsular.'
   },
   {
-    id: 'algeciras',
-    name: 'Algesires (Hub de l’Estret)',
-    city: 'Algesires',
+    id: 'zaragoza',
+    name: 'Saragossa (Centre)',
+    city: 'Saragossa',
     country: 'Espanya',
     category: 'peninsula',
-    typeLabel: 'Port de Transbord Internacional',
-    x: 39,
-    y: 84,
-    location: 'Terminal APM Algeciras / Moll Juan Carlos I',
-    transitTime: 'Connexió 24-48h',
+    typeLabel: 'Entrega VIP 24h',
+    x: 54,
+    y: 53,
+    location: 'Passeig de la Independència',
+    transitTime: '24 hores garantides',
     facilities: [
-      'Pas clau de les rutes marítimes entre Àsia, Amèrica i el Mediterrani',
-      'Enllaç directe Ro-Ro i contenidors amb el Nord d’Àfrica (Tànger Med)',
-      'Inspecció duanera àgil canal OEA'
+      'Entrega en mà a domicili o despatx',
+      'Caixa rígida marfil amb paper de seda rosa',
+      'Canvis gratuïts durant 30 dies'
     ],
-    equipment: 'Xassissos porta-contenidors reforçats',
-    description: 'Porta d’entrada estratègica per a mercaderies intercontinentals i transbords àgils.'
+    equipment: 'Missatgeria dedicada d’alta costura',
+    description: 'Cobertura diària des del nostre atelier central cap a Aragó.'
   },
   {
-    id: 'rotterdam',
-    name: 'Rotterdam (Porta Nord d’Europa)',
-    city: 'Rotterdam',
-    country: 'Països Baixos',
+    id: 'paris',
+    name: 'París (Salon Faubourg Saint-Honoré)',
+    city: 'París',
+    country: 'França',
     category: 'europe',
-    typeLabel: 'Mega-Hub Portuari Europeu',
-    x: 64,
-    y: 22,
-    location: 'Maasvlakte 2 EuroHub / Port of Rotterdam',
-    transitTime: 'Connexió multimodal 48-72h',
+    typeLabel: 'Showroom Alta Costura',
+    x: 61,
+    y: 26,
+    location: 'Rue du Faubourg Saint-Honoré, París',
+    transitTime: 'Enviament Express Europa 48h',
     facilities: [
-      'El port més gran d’Europa amb calat per als majors portacontenidors',
-      'Connexió per barcassa fluvial pel riu Rin fins a Alemanya i Suïssa',
-      'Despatx fiscal intracomunitari immediat'
+      'Salon de presentació de vestits de gala i seda francesa',
+      'Lliurament directe en hotels de 5 estrelles i residències',
+      'Atenció privada amb modistes especialitzades'
     ],
-    equipment: 'Feeder marítim i trens bloc de mercaderies',
-    description: 'Enllaç estratègic per a la distribució cap a Alemanya, Països Baixos, Escandinàvia i Europa Central.'
+    equipment: 'Enllaç internacional directe Barcelona - París',
+    description: 'La nostra adreça de referència a París per a proves i enviaments d’alta costura.'
   },
   {
-    id: 'hamburg',
-    name: 'Hamburg (Corredor Centreeuropeu & Mar Bàltic)',
-    city: 'Hamburg',
-    country: 'Alemanya',
-    category: 'europe',
-    typeLabel: 'Terminal Marítima & Fluvial',
-    x: 74,
-    y: 18,
-    location: 'Container Terminal Altenwerder (CTA)',
-    transitTime: 'Connexió regular 3-4 dies',
-    facilities: [
-      'Terminal altament automatitzada amb connexió ferroviària europea',
-      'Enllaç directe cap als països nòrdics i Bàltics',
-      'Emmagatzematge a temperatura controlada'
-    ],
-    equipment: 'Contenidors Dry i Reefer monitoritzats telemàticament',
-    description: 'Centre neuràlgic per a exportacions catalanes cap al mercat alemany i europeu oriental.'
-  },
-  {
-    id: 'genova',
-    name: 'Gènova & Milà (Corredor Itàlia Nord)',
-    city: 'Gènova',
+    id: 'milano',
+    name: 'Milà & Biella (Telers & Sastreria)',
+    city: 'Milà',
     country: 'Itàlia',
     category: 'europe',
-    typeLabel: 'Terminal Mediterrània Nord',
-    x: 79,
-    y: 45,
-    location: 'Port de Gènova / Terminal Sech & Vado Ligure',
-    transitTime: 'Autopista del Mar 24h / Carretera 18h',
+    typeLabel: 'Filatures & Moda Itàlia',
+    x: 78,
+    y: 41,
+    location: 'Quadrilàter de la Moda / Via Montenapoleone',
+    transitTime: 'Connexió directe 48h',
     facilities: [
-      'Línia Ro-Pax i Ro-Ro directa diària Barcelona - Gènova',
-      'Desplegament ràpid cap al pol industrial de Llombardia (Milà)',
-      'Estalvi de peatges i emissions de CO2 per via marítima'
+      'Origen de les nostres llanes Super 150s i sedes de Como',
+      'Confecció artesanal napolitana i milanesa',
+      'Enviament directe a clients de tota Itàlia'
     ],
-    equipment: 'Semiremolcs de càrrega general i plataformes Ro-Ro',
-    description: 'Connexió fluïda amb el nord d’Itàlia que combina el transport per carretera amb l’autopista del mar.'
+    equipment: 'Transport privat entre telers i atelier',
+    description: 'On neixen els nostres teixits més exclusius abans d’arribar a Barcelona.'
   },
   {
-    id: 'shanghai',
-    name: 'Xangai & Ningbo (Ruta Transoceànica Àsia-Mediterrani)',
-    city: 'Xangai',
-    country: 'Xina / Àsia',
-    category: 'global',
-    typeLabel: 'Ruta Regular d’Importació FCL/LCL',
-    x: 93,
-    y: 42,
-    location: 'Yangshan Deep-Water Port / Ningbo-Zhoushan',
-    transitTime: 'Trànsit marítim directe 24-28 dies',
+    id: 'zurich',
+    name: 'Ginebra & Zúric (Suïssa)',
+    city: 'Zúric',
+    country: 'Suïssa',
+    category: 'europe',
+    typeLabel: 'Concierge & Duana VIP Suïssa',
+    x: 73,
+    y: 27,
+    location: 'Bahnhofstrasse / Rue du Rhône',
+    transitTime: 'Enviament assegurat 48/72h',
     facilities: [
-      'Línies marítimes regulars directes cap al Port de Barcelona',
-      'Control de càrrega i inspecció prèvia a l’embarcament en origen',
-      'Consolidació LCL i contenidors FCL 40’ High Cube'
+      'Despatx duaner suís preferent pre-validat',
+      'Gran demanda en abrics de caixmir i trajes executius',
+      'Entrega privada amb cita concertada'
     ],
-    equipment: 'Vaixells portacontenidors de gran capacitat (+20.000 TEUs)',
-    description: 'La nostra principal línia regular de comerç exterior, connectant les fàbriques xineses directament amb els nostres camions a Barcelona.'
+    equipment: 'Correu aeri i terrestre assegurat a tot risc',
+    description: 'Servei discret i puntual per als nostres clients de banca i diplomàcia a Suïssa.'
+  },
+  {
+    id: 'londres',
+    name: 'Londres (Mayfair & Savile Row)',
+    city: 'Londres',
+    country: 'Regne Unit',
+    category: 'global',
+    typeLabel: 'Tradicions de Sastreria',
+    x: 47,
+    y: 16,
+    location: 'Mayfair, Londres',
+    transitTime: 'Enviament Express 48/72h (amb duana)',
+    facilities: [
+      'Inspiració de sastreria clàssica anglesa i doble botonadura',
+      'Gestió duanera UK completa inclosa a la comanda',
+      'Enviament en porta-trajes rígid fins al domicili'
+    ],
+    equipment: 'Servei aeri internacional de guant blanc',
+    description: 'Connexió regular amb Londres per a clients amants del tall clàssic europeu.'
   }
 ];
 
@@ -271,29 +268,29 @@ export const OperationsMap: React.FC<OperationsMapProps> = ({
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-pink-400 mb-2">
             <Compass className="w-4 h-4 text-pink-500" />
-            <span>Xarxa Operativa & Cobertura Geogràfica</span>
+            <span>Xarxa d&apos;Ateliers, Salons &amp; Lliuraments VIP</span>
             <span aria-hidden="true" className="text-pink-600">/</span>
             <span>TRANSAZZI</span>
           </div>
-          <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Tots els llocs on operem
+          <h3 className="font-serif-luxury text-3xl sm:text-4xl font-semibold text-white tracking-tight">
+            On dissenyem i enviem les nostres col·leccions
           </h3>
           <p className="mt-2 text-xs sm:text-sm text-slate-300 max-w-2xl">
-            Des del nostre quarter general al <strong>Port de Barcelona (BEST / ZAL)</strong>, cobrim les principals terminals portuàries de la Península Ibèrica, els grans hubs europeus i les rutes marítimes globals.
+            Des del nostre <strong>Salon Privé a Passeig de Gràcia (Barcelona)</strong>, realitzem enviaments exclusius en porta-trajes fins a Madrid, Marbella, París, Milà, Suïssa i Londres.
           </p>
         </div>
 
         {/* Filter Pills */}
         <div className="flex flex-wrap items-center gap-2 bg-slate-900 p-1.5 rounded-xl border border-slate-800 self-start lg:self-auto">
           {[
-            { id: 'all', label: 'Tots els Centres (11)', count: 11 },
-            { id: 'peninsula', label: 'Catalunya & Península (7)', count: 7 },
-            { id: 'europe', label: 'Hubs Europeus (3)', count: 3 },
-            { id: 'global', label: 'Rutes Globals (1)', count: 1 }
+            { id: 'all', label: 'Totes les Seus (11)' },
+            { id: 'peninsula', label: 'Espanya & Catalunya (7)' },
+            { id: 'europe', label: 'París, Milà & Suïssa (3)' },
+            { id: 'global', label: 'Londres Mayfair (1)' }
           ].map((filter) => (
             <button
               key={filter.id}
-              onClick={() => setFilterCategory(filter.id as any)}
+              onClick={() => setFilterCategory(filter.id as 'all' | 'peninsula' | 'europe' | 'global')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 filterCategory === filter.id
                   ? 'bg-pink-600 text-white shadow-sm shadow-pink-600/30'
@@ -308,9 +305,7 @@ export const OperationsMap: React.FC<OperationsMapProps> = ({
 
       {/* Main Map + Inspector Split */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Side: Interactive Stylized Map Canvas (7 cols) */}
         <div className="lg:col-span-7 bg-slate-900/90 rounded-2xl border border-pink-950/80 p-4 sm:p-6 relative overflow-hidden shadow-inner flex flex-col justify-between min-h-[460px] sm:min-h-[520px]">
-          {/* Subtle Grid Watermark Pattern */}
           <div
             className="absolute inset-0 opacity-15 pointer-events-none"
             style={{
@@ -321,16 +316,13 @@ export const OperationsMap: React.FC<OperationsMapProps> = ({
             }}
           />
 
-          {/* Top Map Badges */}
           <div className="relative z-10 flex items-center justify-between text-[11px] font-mono text-slate-400 mb-2">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
-              <span>RADAR LOGÍSTIC ACTIU</span>
+              <span>RUTES D&apos;ALTA COSTURA &amp; CONCIERGE</span>
             </div>
-            <span className="text-pink-400">CORREDOR MEDITERRANI & TRANSATLÀNTIC</span>
+            <span className="text-pink-400">ATELIERS · SALONS · LLIURAMENT VIP</span>
           </div>
 
-          {/* SVG Map Graphic Container */}
           <div className="relative w-full aspect-[4/3] my-auto">
             <svg
               viewBox="0 0 800 600"
@@ -338,59 +330,33 @@ export const OperationsMap: React.FC<OperationsMapProps> = ({
               preserveAspectRatio="xMidYMid meet"
             >
               <defs>
-                {/* Glow Filter for Active Point */}
                 <filter id="pink-glow" x="-30%" y="-30%" width="160%" height="160%">
                   <feGaussianBlur stdDeviation="6" result="blur" />
                   <feComposite in="SourceGraphic" in2="blur" operator="over" />
                 </filter>
-
-                {/* Linear gradient for route lines */}
-                <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#ec4899" stopOpacity="0.8" />
-                  <stop offset="100%" stopColor="#f43f5e" stopOpacity="0.3" />
-                </linearGradient>
               </defs>
 
-              {/* Simplified stylized land outlines for Europe & Iberian Peninsula */}
-              {/* Iberian Peninsula silhouette */}
               <path
-                d="M 280 340 L 350 330 L 400 350 L 440 340 L 480 370 L 490 410 L 480 440 L 440 470 L 370 480 L 320 460 L 290 430 L 270 380 Z"
-                fill="#0f172a"
-                stroke="#1e293b"
-                strokeWidth="2"
-                className="transition-colors hover:fill-slate-900"
-              />
-
-              {/* Western & Central Europe silhouette */}
-              <path
-                d="M 440 335 L 480 310 L 510 240 L 540 200 L 580 180 L 630 190 L 660 230 L 640 280 L 610 320 L 580 360 L 520 370 L 480 370 Z"
+                d="M 210 300 L 350 285 L 400 325 L 490 340 L 505 405 L 480 460 L 420 500 L 320 510 L 235 480 L 210 410 Z"
                 fill="#0f172a"
                 stroke="#1e293b"
                 strokeWidth="2"
               />
 
-              {/* Mediterranean Sea subtle shape */}
               <path
-                d="M 490 410 Q 560 410 630 430 Q 700 450 780 430"
-                fill="none"
-                stroke="#ec4899"
-                strokeWidth="1"
-                strokeDasharray="4 6"
-                opacity="0.25"
+                d="M 440 335 L 480 285 L 510 210 L 550 150 L 620 130 L 680 150 L 700 220 L 670 280 L 640 320 L 580 360 L 520 355 L 480 345 Z"
+                fill="#0f172a"
+                stroke="#1e293b"
+                strokeWidth="2"
               />
 
-              {/* Dynamic Connection lines from Barcelona (HQ) to all points */}
               {filteredPoints.map((point) => {
                 if (point.id === 'bcn') return null;
-                // Calculate coordinate transforms from 0-100 to svg 800x600
                 const x1 = (bcnHQ.x / 100) * 800;
                 const y1 = (bcnHQ.y / 100) * 600;
                 const x2 = (point.x / 100) * 800;
                 const y2 = (point.y / 100) * 600;
-
                 const isSelected = selectedPointId === point.id;
-
-                // Curved control point
                 const cx = (x1 + x2) / 2 - (y2 - y1) * 0.15;
                 const cy = (y1 + y2) / 2 + (x2 - x1) * 0.15;
 
@@ -403,13 +369,11 @@ export const OperationsMap: React.FC<OperationsMapProps> = ({
                       strokeWidth={isSelected ? '2.5' : '1.5'}
                       strokeDasharray={isSelected ? '6 4' : '3 3'}
                       opacity={isSelected ? 1 : 0.6}
-                      className={isSelected ? 'animate-pulse' : ''}
                     />
                   </g>
                 );
               })}
 
-              {/* Render Nodes / Pins on SVG */}
               {filteredPoints.map((point) => {
                 const px = (point.x / 100) * 800;
                 const py = (point.y / 100) * 600;
@@ -422,7 +386,6 @@ export const OperationsMap: React.FC<OperationsMapProps> = ({
                     className="cursor-pointer transition-transform duration-200"
                     onClick={() => setSelectedPointId(point.id)}
                   >
-                    {/* Pulsing ring for HQ or selected point */}
                     {(isHQ || isSelected) && (
                       <circle
                         cx={px}
@@ -430,13 +393,11 @@ export const OperationsMap: React.FC<OperationsMapProps> = ({
                         r={isSelected ? 18 : 14}
                         fill="none"
                         stroke="#ec4899"
-                        strokeWidth="2"
-                        opacity="0.8"
-                        className="animate-ping"
+                        strokeWidth="1.5"
+                        opacity="0.55"
                       />
                     )}
 
-                    {/* Outer glow circle */}
                     <circle
                       cx={px}
                       cy={py}
@@ -447,7 +408,6 @@ export const OperationsMap: React.FC<OperationsMapProps> = ({
                       filter={isSelected ? 'url(#pink-glow)' : ''}
                     />
 
-                    {/* Inner Center Dot */}
                     <circle
                       cx={px}
                       cy={py}
@@ -455,7 +415,6 @@ export const OperationsMap: React.FC<OperationsMapProps> = ({
                       fill={isHQ || isSelected ? '#ffffff' : '#ec4899'}
                     />
 
-                    {/* Label Tag */}
                     <text
                       x={px}
                       y={py - 14}
@@ -476,30 +435,28 @@ export const OperationsMap: React.FC<OperationsMapProps> = ({
             </svg>
           </div>
 
-          {/* Interactive instruction bar */}
           <div className="relative z-10 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between text-[11px] text-slate-400 gap-2">
             <div className="flex items-center gap-3">
               <span className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-pink-500 ring-2 ring-pink-300 inline-block" />
-                <span>Quarter General (Barcelona)</span>
+                <span>Atelier Central (Barcelona)</span>
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-slate-700 border border-pink-400 inline-block" />
-                <span>Hubs / Terminals</span>
+                <span>Salons &amp; Destins VIP</span>
               </span>
             </div>
-            <span className="text-pink-400">Fes clic sobre qualsevol punt per inspeccionar-lo</span>
+            <span className="text-pink-400">Fes clic sobre qualsevol ciutat per inspeccionar-la</span>
           </div>
         </div>
 
-        {/* Right Side: Detailed Location Inspector Card (5 cols) */}
+        {/* Right Side: Detailed Location Inspector Card */}
         <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
           <div className="bg-slate-900 rounded-2xl border border-pink-500/40 p-6 sm:p-7 shadow-xl relative animate-in fade-in duration-200">
-            {/* Location Type Badge */}
             <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-3 mb-4">
               <div className="flex items-center gap-2">
                 <span className="p-1 rounded-md bg-pink-600/20 text-pink-400 border border-pink-500/30">
-                  {selectedPoint.isHQ ? <Anchor className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}
+                  {selectedPoint.isHQ ? <Crown className="w-4 h-4" /> : <MapPin className="w-4 h-4" />}
                 </span>
                 <span className="text-xs font-mono font-bold text-pink-400 uppercase tracking-wider">
                   {selectedPoint.typeLabel}
@@ -507,13 +464,12 @@ export const OperationsMap: React.FC<OperationsMapProps> = ({
               </div>
               {selectedPoint.isHQ && (
                 <span className="px-2.5 py-0.5 rounded-md bg-pink-600 text-white text-[10px] font-bold uppercase tracking-wider">
-                  Seu Central
+                  Maison Central
                 </span>
               )}
             </div>
 
-            {/* City & Name */}
-            <h4 className="text-xl sm:text-2xl font-bold text-white mb-1">
+            <h4 className="font-serif-luxury text-2xl sm:text-3xl font-semibold text-white mb-1">
               {selectedPoint.name}
             </h4>
             <div className="text-xs text-slate-400 mb-4 flex items-center gap-1.5">
@@ -525,12 +481,11 @@ export const OperationsMap: React.FC<OperationsMapProps> = ({
               {selectedPoint.description}
             </p>
 
-            {/* Detailed Parameters List */}
             <div className="space-y-3 bg-slate-950/70 p-4 rounded-xl border border-slate-800 mb-5 text-xs">
               <div className="flex items-start gap-2.5">
                 <Navigation className="w-4 h-4 text-pink-400 shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-slate-400 block text-[11px]">Ubicació física / Moll:</span>
+                  <span className="text-slate-400 block text-[11px]">Adreça / Zona VIP:</span>
                   <span className="font-semibold text-slate-100">{selectedPoint.location}</span>
                 </div>
               </div>
@@ -538,7 +493,7 @@ export const OperationsMap: React.FC<OperationsMapProps> = ({
               <div className="flex items-start gap-2.5 pt-2 border-t border-slate-850">
                 <Clock className="w-4 h-4 text-pink-400 shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-slate-400 block text-[11px]">Temps de trànsit / Resposta:</span>
+                  <span className="text-slate-400 block text-[11px]">Termini de lliurament:</span>
                   <span className="font-semibold text-pink-300 font-mono">{selectedPoint.transitTime}</span>
                 </div>
               </div>
@@ -546,16 +501,15 @@ export const OperationsMap: React.FC<OperationsMapProps> = ({
               <div className="flex items-start gap-2.5 pt-2 border-t border-slate-850">
                 <Truck className="w-4 h-4 text-pink-400 shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-slate-400 block text-[11px]">Equips i Flota assignada:</span>
+                  <span className="text-slate-400 block text-[11px]">Transport assignat:</span>
                   <span className="font-semibold text-slate-100">{selectedPoint.equipment}</span>
                 </div>
               </div>
             </div>
 
-            {/* Specific Services Available at this Point */}
             <div className="mb-6">
               <span className="text-[11px] font-bold text-pink-400 uppercase tracking-wider block mb-2">
-                Instal·lacions & Avantatges Clau:
+                Serveis privats en aquesta ciutat:
               </span>
               <div className="space-y-1.5">
                 {selectedPoint.facilities.map((fac, idx) => (
@@ -567,24 +521,22 @@ export const OperationsMap: React.FC<OperationsMapProps> = ({
               </div>
             </div>
 
-            {/* Action CTA for this location */}
             <button
               onClick={() => {
                 if (onSelectLocationForQuote) {
-                  onSelectLocationForQuote(`Operativa amb origen/destí a ${selectedPoint.name}`);
+                  onSelectLocationForQuote(`Encàrrec o cita privada a ${selectedPoint.name}`);
                 }
               }}
               className="w-full flex items-center justify-center gap-2 py-3 px-4 text-xs font-semibold text-white bg-pink-600 hover:bg-pink-500 rounded-xl shadow-md shadow-pink-600/30 transition-all duration-150"
             >
-              <span>Demanar Cotització per a {selectedPoint.city}</span>
+              <span>Sol·licitar enviament o cita a {selectedPoint.city}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Location Quick Switcher List */}
           <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-800 text-xs">
             <span className="text-slate-400 block mb-2 font-medium">
-              Altres punts operatius actius:
+              Tots els salons i destins actius:
             </span>
             <div className="flex flex-wrap gap-1.5">
               {OPERATIONAL_POINTS.map((pt) => (

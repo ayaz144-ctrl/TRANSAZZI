@@ -37,7 +37,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
 
           <div className="absolute bottom-4 left-6 right-6 text-white text-left">
             <span className="text-xs font-mono font-bold text-pink-400">
-              FITXA TÈCNICA {service.number}
+              COL·LECCIÓ {service.number}
             </span>
             <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
               {service.title}
@@ -55,7 +55,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
           {/* Key Specs Table */}
           <div className="bg-pink-50/40 rounded-xl p-5 border border-pink-100">
             <h4 className="text-xs font-bold uppercase tracking-wider text-pink-700 mb-3">
-              Paràmetres Tècnics & Rangs Operatius
+              Teixits, Tallatge &amp; Enviament
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               {service.specs.map((spec, idx) => (
@@ -70,7 +70,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
           {/* Operational features */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-pink-700 mb-3">
-              Avantatges i Garanties Contractuals
+              Detalls i Garanties TransAzzi
             </h4>
             <div className="space-y-2">
               {service.features.map((feat, idx) => (
@@ -86,7 +86,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
           {service.products && service.products.length > 0 && (
             <div className="bg-pink-50/50 p-4 rounded-xl border border-pink-200">
               <h4 className="text-xs font-bold uppercase tracking-wider text-pink-800 mb-3">
-                Productes & Solucions Operatives Homologades
+                Peces Destacades d&apos;aquesta Col·lecció
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 {service.products.map((p) => (
@@ -109,12 +109,12 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
             </div>
           )}
 
-          {/* Commercial & Incoterms info in Pink Box */}
+          {/* Commercial & Size info in Pink Box */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-200 text-xs">
             <div className="bg-pink-50/70 p-3.5 rounded-lg border border-pink-200">
               <div className="flex items-center gap-1.5 text-pink-700 font-bold mb-1">
                 <Tag className="w-3.5 h-3.5" />
-                <span>Incoterms Habituals</span>
+                <span>Talles Disponibles</span>
               </div>
               <div className="flex flex-wrap gap-1 font-mono text-slate-700">
                 {service.incoterms.join(', ')}
@@ -124,7 +124,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
             <div className="bg-pink-50/70 p-3.5 rounded-lg border border-pink-200">
               <div className="flex items-center gap-1.5 text-pink-700 font-bold mb-1">
                 <Clock className="w-3.5 h-3.5" />
-                <span>Trànsit Mitjà</span>
+                <span>Termini d&apos;Entrega</span>
               </div>
               <div className="text-slate-700">{service.typicalTransit}</div>
             </div>
@@ -132,7 +132,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
             <div className="bg-pink-50/70 p-3.5 rounded-lg border border-pink-200">
               <div className="flex items-center gap-1.5 text-pink-700 font-bold mb-1">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Règim Aranzelari</span>
+                <span>Preu Orientatiu</span>
               </div>
               <div className="text-slate-700">{service.baseRateEstimate}</div>
             </div>
@@ -155,7 +155,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
             }}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-pink-600 hover:bg-pink-500 rounded-lg shadow-sm shadow-pink-600/30 transition-colors"
           >
-            <span>Demanar cotització per a {service.title}</span>
+            <span>Demanar comanda de {service.title}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>

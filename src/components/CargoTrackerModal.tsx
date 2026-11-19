@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TRACKING_DATABASE, TrackingData } from '../data/companyData';
-import { X, Search, Anchor, Ship, CheckCircle2, Clock, MapPin, AlertCircle } from 'lucide-react';
+import { X, Search, ShoppingBag, Truck, MapPin, AlertCircle } from 'lucide-react';
 
 interface CargoTrackerModalProps {
   initialCode?: string;
@@ -24,7 +24,7 @@ export const CargoTrackerModal: React.FC<CargoTrackerModalProps> = ({
       setActiveTracking(TRACKING_DATABASE[formatted]);
       setSearchError(null);
     } else {
-      setSearchError(`No s'ha trobat cap embarcament amb la referència "${formatted}". Prova amb les referències de demostració "BCN-98234" o "MED-44102".`);
+      setSearchError(`No s'ha trobat cap enviament amb el codi "${formatted}". Prova amb les referències de demostració "BCN-98234" o "MED-44102".`);
     }
   };
 
@@ -41,14 +41,14 @@ export const CargoTrackerModal: React.FC<CargoTrackerModalProps> = ({
         <div className="bg-slate-950 text-white px-6 py-4 flex items-center justify-between border-b border-pink-900/40">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-pink-600 flex items-center justify-center shadow-xs">
-              <Ship className="w-4 h-4 text-white" />
+              <ShoppingBag className="w-4 h-4 text-white" />
             </div>
             <div>
               <h3 className="text-base font-bold text-white">
-                Sistema de Seguiment de Càrrega (Live Cargo Tracking)
+                Seguiment Concierge d&apos;Alta Costura TRANSAZZI
               </h3>
               <p className="text-[11px] text-pink-300">
-                Traçabilitat per satèl·lit i flota TransAzzi en temps real
+                Traçabilitat privada del teu vestit o traje des de Passeig de Gràcia
               </p>
             </div>
           </div>
@@ -69,7 +69,7 @@ export const CargoTrackerModal: React.FC<CargoTrackerModalProps> = ({
                 type="text"
                 value={searchCode}
                 onChange={(e) => setSearchCode(e.target.value)}
-                placeholder="Introdueix número de seguiment B/L o Contenidor..."
+                placeholder="Introdueix el codi de la teva comanda VIP (ex: BCN-98234)..."
                 className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-pink-500 bg-white font-mono text-slate-900"
               />
             </div>
@@ -93,7 +93,7 @@ export const CargoTrackerModal: React.FC<CargoTrackerModalProps> = ({
                   : 'bg-white text-slate-700 border-slate-200 hover:border-pink-500 hover:text-pink-600'
               }`}
             >
-              BCN-98234 (Import Àsia)
+              BCN-98234 (Vestit &amp; Traje · Madrid)
             </button>
             <button
               type="button"
@@ -104,7 +104,7 @@ export const CargoTrackerModal: React.FC<CargoTrackerModalProps> = ({
                   : 'bg-white text-slate-700 border-slate-200 hover:border-pink-500 hover:text-pink-600'
               }`}
             >
-              MED-44102 (Export València Reefer)
+              MED-44102 (Cofre VIP · València)
             </button>
           </div>
 
@@ -123,12 +123,16 @@ export const CargoTrackerModal: React.FC<CargoTrackerModalProps> = ({
             <div className="bg-slate-950 text-white rounded-xl p-5 border border-pink-900/40">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3 mb-4">
                 <div>
-                  <span className="text-xs text-pink-300 font-mono">REFERÈNCIA OPERATIVA:</span>
+                  <span className="text-xs text-pink-300 font-mono">CODI DE COMANDA:</span>
                   <h4 className="text-xl font-bold font-mono text-white">{activeTracking.code}</h4>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="px-2.5 py-1 rounded-md bg-pink-500/20 text-pink-300 text-xs font-semibold border border-pink-400/30">
-                    {activeTracking.status}
+                    {activeTracking.status === 'En trànsit marítim'
+                      ? 'En trànsit express'
+                      : activeTracking.status === 'Despatx duaner completat'
+                      ? 'En repartiment'
+                      : activeTracking.status}
                   </span>
                 </div>
               </div>
@@ -136,7 +140,7 @@ export const CargoTrackerModal: React.FC<CargoTrackerModalProps> = ({
               {/* Progress bar in Pink */}
               <div className="mb-4">
                 <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
-                  <span>Progrés de la ruta marítima</span>
+                  <span>Progrés de l&apos;enviament</span>
                   <span className="font-mono text-pink-300 font-bold">{activeTracking.progress}%</span>
                 </div>
                 <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
@@ -159,7 +163,7 @@ export const CargoTrackerModal: React.FC<CargoTrackerModalProps> = ({
                 </div>
 
                 <div className="flex items-start gap-2.5">
-                  <Anchor className="w-4 h-4 text-pink-400 shrink-0 mt-0.5" />
+                  <Truck className="w-4 h-4 text-pink-400 shrink-0 mt-0.5" />
                   <div>
                     <span className="text-slate-400 block">Destinació (ETA):</span>
                     <span className="font-semibold text-slate-100">{activeTracking.destination}</span>
@@ -169,30 +173,30 @@ export const CargoTrackerModal: React.FC<CargoTrackerModalProps> = ({
               </div>
             </div>
 
-            {/* Technical Cargo Meta */}
+            {/* Garment Meta */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-pink-50/40 p-4 rounded-xl border border-pink-200 text-xs">
               <div>
-                <span className="text-slate-500 block">Buc assignat:</span>
+                <span className="text-slate-500 block">Transport:</span>
                 <span className="font-semibold text-slate-900">{activeTracking.vessel}</span>
               </div>
               <div>
-                <span className="text-slate-500 block">Contenidor:</span>
+                <span className="text-slate-500 block">Embalatge:</span>
                 <span className="font-mono font-semibold text-slate-900">{activeTracking.containerId}</span>
               </div>
               <div>
-                <span className="text-slate-500 block">Pes brut:</span>
+                <span className="text-slate-500 block">Pes paquet:</span>
                 <span className="font-mono font-semibold text-slate-900">{activeTracking.weight}</span>
               </div>
               <div>
-                <span className="text-slate-500 block">Condició càrrega:</span>
-                <span className="font-semibold text-slate-900">{activeTracking.temperature || 'Estàndard'}</span>
+                <span className="text-slate-500 block">Cura tèxtil:</span>
+                <span className="font-semibold text-slate-900">{activeTracking.temperature || 'Protecció Boutique'}</span>
               </div>
             </div>
 
             {/* Milestones Timeline */}
             <div>
               <h5 className="text-xs font-bold uppercase tracking-wider text-pink-700 mb-4">
-                Històric d'Operacions i Fites de la Ruta
+                Històric de Preparació i Ruta
               </h5>
 
               <div className="space-y-4 relative pl-6 before:content-[''] before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-pink-100">

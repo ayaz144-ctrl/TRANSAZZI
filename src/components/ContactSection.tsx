@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { OFFICE_DATA } from '../data/companyData';
-import { Mail, Phone, MapPin, Clock, Send, CheckCircle2, ShieldCheck, Building2 } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, Send, CheckCircle2, ShieldCheck, Building2, AlertCircle } from 'lucide-react';
+
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mdegnaqk';
 
 interface ContactSectionProps {
   companyName: string;
@@ -8,39 +10,78 @@ interface ContactSectionProps {
 }
 
 export const ContactSection: React.FC<ContactSectionProps> = ({
-  companyName,
-  prefilledService = 'Transport Portuari'
+  prefilledService = "Vestits d'Alta Costura & Gala"
 }) => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
-    serviceType: prefilledService || 'Transport Portuari',
+    serviceType: prefilledService || "Vestits d'Alta Costura & Gala",
     message: '',
     privacyAccepted: true
   });
 
+  useEffect(() => {
+    if (prefilledService) {
+      setFormData((prev) => ({ ...prev, serviceType: prefilledService }));
+    }
+  }, [prefilledService]);
+
   const [submittedTicket, setSubmittedTicket] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitError(null);
 
-    setTimeout(() => {
-      const randomTicket = `TRZ-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
-      setSubmittedTicket(randomTicket);
+    const ticketRef = `TRZ-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    try {
+      const response = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify({
+          _subject: `[TRANSAZZI Maison Contacte] ${formData.serviceType} - ${formData.fullName} (${ticketRef})`,
+          referencia: ticketRef,
+          nom_i_cognoms: formData.fullName,
+          email: formData.email,
+          telefon: formData.phone,
+          colleccio_o_cita: formData.serviceType,
+          missatge: formData.message,
+          privacitat_acceptada: formData.privacyAccepted ? 'Sí' : 'No',
+          origen_formulari: 'Secció Contacte Maison TRANSAZZI'
+        })
+      });
+
+      if (response.ok) {
+        setSubmittedTicket(ticketRef);
+      } else {
+        const data = await response.json().catch(() => null);
+        const errorMsg =
+          data?.errors?.map((err: { message: string }) => err.message).join(', ') ||
+          "No s'ha pogut enviar el missatge en aquest moment. Torna-ho a provar o escriu-nos a atelier@transazzi.com.";
+        setSubmitError(errorMsg);
+      }
+    } catch {
+      setSubmitError("Error de connexió en enviar el formulari. Comprova la teva connexió a internet i torna-ho a intentar.");
+    } finally {
       setIsSubmitting(false);
-    }, 500);
+    }
   };
 
   const handleReset = () => {
     setSubmittedTicket(null);
+    setSubmitError(null);
     setFormData({
       fullName: '',
       email: '',
       phone: '',
-      serviceType: 'Transport Portuari',
+      serviceType: "Vestits d'Alta Costura & Gala",
       message: '',
       privacyAccepted: true
     });
@@ -51,45 +92,43 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-14 text-left">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-pink-600 mb-2">
-            <span>Atenció al Client</span>
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-pink-600 mb-2">
+            <span>Servei Concierge &amp; Cita Privada</span>
             <span aria-hidden="true" className="text-pink-300">/</span>
-            <span>TRANSAZZI</span>
+            <span>Maison TRANSAZZI</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight text-balance">
-            Contacta amb nosaltres
+          <h2 className="font-serif-luxury text-3xl sm:text-4xl lg:text-5xl font-semibold text-slate-900 tracking-tight text-balance">
+            Sol·licita Cita al Salon o Assessorament Privé
           </h2>
           <p className="mt-3 text-base text-slate-600 leading-relaxed">
-            Estem a la teva disposició per resoldre qualsevol dubte o oferir-te una cotització personalitzada.
+            Reserva una sessió amb el nostre mestre sastre, demana mesures per a un vestit de gala o consulta l&apos;enviament urgent del teu traje.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          {/* Left Column: Dades de Contacte Reals (5 cols) */}
+          {/* Left Column: Salon Info */}
           <div className="lg:col-span-5 flex flex-col justify-between space-y-8">
             <div className="space-y-6 text-left">
               <div className="bg-pink-50/50 p-6 rounded-2xl border border-pink-200">
                 <div className="flex items-center gap-2 text-xs font-bold text-pink-600 uppercase tracking-wider mb-3">
                   <Building2 className="w-4 h-4" />
-                  <span>Dades de Contacte Reals</span>
+                  <span>Salon Privé Barcelona</span>
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-4">{OFFICE_DATA.companyFormal}</h3>
+                <h3 className="font-serif-luxury text-2xl font-semibold text-slate-900 mb-4">{OFFICE_DATA.companyFormal}</h3>
 
                 <div className="space-y-4 text-xs sm:text-sm">
-                  {/* Adreça física */}
                   <div className="flex items-start gap-3 text-slate-700">
                     <MapPin className="w-4 h-4 text-pink-600 shrink-0 mt-0.5" />
                     <div>
-                      <div className="font-semibold text-slate-900">Adreça física:</div>
+                      <div className="font-semibold text-slate-900">Adreça del Salon:</div>
                       <div>{OFFICE_DATA.address}, {OFFICE_DATA.postalCode}</div>
                     </div>
                   </div>
 
-                  {/* Telèfon d'atenció */}
                   <div className="flex items-start gap-3 text-slate-700">
                     <Phone className="w-4 h-4 text-pink-600 shrink-0 mt-0.5" />
                     <div>
-                      <div className="font-semibold text-slate-900">Telèfon d'atenció:</div>
+                      <div className="font-semibold text-slate-900">Telèfon Concierge:</div>
                       <div>
                         <a href={`tel:${OFFICE_DATA.phone}`} className="font-medium text-pink-600 hover:underline">
                           {OFFICE_DATA.phone}
@@ -98,11 +137,10 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                     </div>
                   </div>
 
-                  {/* Correu electrònic */}
                   <div className="flex items-start gap-3 text-slate-700">
                     <Mail className="w-4 h-4 text-pink-600 shrink-0 mt-0.5" />
                     <div>
-                      <div className="font-semibold text-slate-900">Correu electrònic:</div>
+                      <div className="font-semibold text-slate-900">Correu de l&apos;Atelier:</div>
                       <div>
                         <a href={`mailto:${OFFICE_DATA.emailGeneral}`} className="font-medium text-pink-600 hover:underline">
                           {OFFICE_DATA.emailGeneral}
@@ -111,29 +149,27 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                     </div>
                   </div>
 
-                  {/* Horari d'atenció */}
                   <div className="flex items-start gap-3 text-slate-700 pt-2 border-t border-pink-200/60">
                     <Clock className="w-4 h-4 text-pink-600 shrink-0 mt-0.5" />
                     <div>
-                      <div className="font-semibold text-slate-900">Horari d'atenció:</div>
+                      <div className="font-semibold text-slate-900">Horari de proves:</div>
                       <div>{OFFICE_DATA.schedule}</div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Trust Badge */}
               <div className="p-4 rounded-xl bg-pink-50/80 border border-pink-200 flex items-start gap-3">
                 <ShieldCheck className="w-5 h-5 text-pink-600 shrink-0 mt-0.5" />
                 <div className="text-xs text-slate-700">
-                  <span className="font-bold text-pink-950 block">Atenció Ràpida i Personalitzada</span>
-                  El nostre equip de coordinació de transport portuari respon a totes les consultes en menys de 24 hores hàbils.
+                  <span className="font-bold text-pink-950 block">Sastreria &amp; Alta Costura Personalitzada</span>
+                  Cada consulta és atesa directament pels nostres estilistes i mestres sastres en menys de 24 hores.
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Formulari de Contacte Visual (7 cols) */}
+          {/* Right Column: Contact Form */}
           <div className="lg:col-span-7">
             <div className="bg-white rounded-2xl border border-pink-200/90 p-6 sm:p-8 shadow-xs text-left">
               {submittedTicket ? (
@@ -141,75 +177,74 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   <div className="w-14 h-14 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center mx-auto mb-4">
                     <CheckCircle2 className="w-8 h-8" />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">
-                    Missatge Enviat Correctament!
+                  <h3 className="font-serif-luxury text-2xl font-semibold text-slate-900 mb-2">
+                    Sol·licitud Rebuda a l&apos;Atelier!
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto mb-4">
-                    Gràcies per contactar amb TRANSAZZI. Hem registrat la teva sol·licitud i et respondrem en menys de 24 hores.
+                    Gràcies per contactar amb TRANSAZZI. El nostre equip de Concierge es posarà en contacte amb tu en breu.
                   </p>
 
                   <div className="bg-pink-50 border border-pink-200 rounded-xl p-4 max-w-sm mx-auto mb-6 text-left text-xs">
-                    <div className="text-slate-500 font-medium">Referència de seguiment:</div>
+                    <div className="text-slate-500 font-medium">Referència:</div>
                     <div className="text-base font-bold font-mono text-pink-600 my-1">{submittedTicket}</div>
-                    <div className="text-slate-500">Nom: <strong className="text-slate-800">{formData.fullName}</strong></div>
+                    <div className="text-slate-500">Client: <strong className="text-slate-800">{formData.fullName}</strong></div>
                     <div className="text-slate-500">Correu: <strong className="text-slate-800">{formData.email}</strong></div>
-                    <div className="text-slate-500">Servei: <strong className="text-slate-800">{formData.serviceType}</strong></div>
+                    <div className="text-slate-500">Selecció: <strong className="text-slate-800">{formData.serviceType}</strong></div>
                   </div>
 
                   <button
                     onClick={handleReset}
                     className="px-5 py-2.5 text-xs font-semibold text-slate-700 bg-pink-50 hover:bg-pink-100 border border-pink-200 rounded-lg transition-colors"
                   >
-                    Enviar un altre missatge
+                    Enviar una altra consulta
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {/* Títol del formulari: Envia'ns un missatge i et respondrem en menys de 24 hores. */}
+                <form action={FORMSPREE_ENDPOINT} method="POST" onSubmit={handleSubmit} className="space-y-4">
                   <div className="border-b border-pink-100 pb-3 mb-2">
                     <h3 className="text-lg font-bold text-slate-900">
-                      Envia'ns un missatge i et respondrem en menys de 24 hores.
+                      Escriu-nos i rebràs atenció privada en menys de 24 hores.
                     </h3>
                   </div>
 
-                  {/* 1. Nom i Cognoms (Text) */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                       Nom i Cognoms <span className="text-pink-600">*</span>
                     </label>
                     <input
                       type="text"
+                      name="nom_i_cognoms"
                       required
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      placeholder="Introdueix el teu nom i cognoms"
+                      placeholder="El teu nom complet"
                       className="w-full px-3.5 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-slate-900 placeholder:text-slate-400"
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* 2. Correu Electrònic (Email) */}
                     <div>
                       <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                         Correu Electrònic <span className="text-pink-600">*</span>
                       </label>
                       <input
                         type="email"
+                        name="email"
                         required
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="el.teu.correu@empresa.com"
+                        placeholder="nom@correu.cat"
                         className="w-full px-3.5 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-slate-900 placeholder:text-slate-400"
                       />
                     </div>
 
-                    {/* 3. Telèfon de Contacte (Telèfon) */}
                     <div>
                       <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                         Telèfon de Contacte <span className="text-pink-600">*</span>
                       </label>
                       <input
                         type="tel"
+                        name="telefon"
                         required
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -219,42 +254,44 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                     </div>
                   </div>
 
-                  {/* 4. Tipus de Servei requerit (Desplegable: Transport Portuari / Emmagatzematge / Càrrega Especial) */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                      Tipus de Servei requerit <span className="text-pink-600">*</span>
+                      Col·lecció o Servei d&apos;Interès <span className="text-pink-600">*</span>
                     </label>
                     <select
+                      name="colleccio_o_cita"
                       value={formData.serviceType}
                       onChange={(e) => setFormData({ ...formData, serviceType: e.target.value })}
                       className="w-full px-3.5 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-slate-900 bg-white"
                     >
-                      <option value="Transport Portuari">Transport Portuari</option>
-                      <option value="Emmagatzematge">Emmagatzematge</option>
-                      <option value="Càrrega Especial">Càrrega Especial</option>
+                      <option value="Vestits d'Alta Costura & Gala">Vestits d&apos;Alta Costura &amp; Gala</option>
+                      <option value="Sastreria de Luxe Home (Super 150s)">Sastreria de Luxe Home (Super 150s)</option>
+                      <option value="Sastreria de Luxe Dona & Blazers">Sastreria de Luxe Dona &amp; Blazers</option>
+                      <option value="Marroquineria, Seda & Cofre VIP">Marroquineria, Seda &amp; Cofre VIP</option>
+                      <option value="Cita Privada a Mida / Bespoke">Cita Privada a Mida / Bespoke</option>
                     </select>
                   </div>
 
-                  {/* 5. Missatge o Detalls de la Càrrega (Àrea de text) */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                      Missatge o Detalls de la Càrrega <span className="text-pink-600">*</span>
+                      Detalls del Vestit, Traje o Data de l&apos;Esdeveniment <span className="text-pink-600">*</span>
                     </label>
                     <textarea
+                      name="missatge"
                       required
                       rows={4}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      placeholder="Explica'ns els detalls de la teva càrrega: origen, destí, dimensions, dates d'arribada al port..."
+                      placeholder="Explica'ns quina peça busques, la teva talla habitual o la data del teu esdeveniment..."
                       className="w-full px-3.5 py-2.5 text-xs sm:text-sm border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-slate-900 placeholder:text-slate-400 leading-relaxed"
                     />
                   </div>
 
-                  {/* 6. Casella de verificació: "He llegit i accepto la Política de Privacitat." */}
                   <div className="flex items-center gap-2 text-xs text-slate-600 pt-1">
                     <input
                       type="checkbox"
                       id="privacy"
+                      name="privacitat_acceptada"
                       checked={formData.privacyAccepted}
                       onChange={(e) => setFormData({ ...formData, privacyAccepted: e.target.checked })}
                       required
@@ -265,18 +302,24 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                     </label>
                   </div>
 
-                  {/* Botó d'enviament: [ Enviar Missatge ] */}
+                  {submitError && (
+                    <div className="p-3 bg-red-50 text-red-700 text-xs rounded-lg flex items-start gap-2 border border-red-200">
+                      <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                      <span>{submitError}</span>
+                    </div>
+                  )}
+
                   <button
                     type="submit"
                     disabled={isSubmitting}
                     className="w-full flex items-center justify-center gap-2 py-3 px-6 text-xs sm:text-sm font-semibold text-white bg-pink-600 hover:bg-pink-500 disabled:bg-pink-400 rounded-xl shadow-md shadow-pink-600/30 transition-all duration-150"
                   >
                     {isSubmitting ? (
-                      <span>Enviant missatge...</span>
+                      <span>Enviant sol·licitud...</span>
                     ) : (
                       <>
                         <Send className="w-4 h-4" />
-                        <span>Enviar Missatge</span>
+                        <span>Enviar Consulta a l&apos;Atelier</span>
                       </>
                     )}
                   </button>

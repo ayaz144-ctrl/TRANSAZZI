@@ -50,7 +50,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ post, onClose }) => 
           <div className="bg-pink-50/70 rounded-xl p-5 border border-pink-200">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-pink-700 mb-3">
               <BookmarkCheck className="w-4 h-4 text-pink-600" />
-              <span>Punts Clau per a l'Exportador / Importador</span>
+              <span>Punts Clau d&apos;Estil &amp; Qualitat</span>
             </div>
             <div className="space-y-2">
               {post.keyTakeaways.map((takeaway, idx) => (

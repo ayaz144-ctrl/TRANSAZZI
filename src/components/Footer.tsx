@@ -50,20 +50,20 @@ export const Footer: React.FC<FooterProps> = ({
             </div>
 
             <p className="text-sm text-slate-300 leading-relaxed font-medium">
-              Líders en transport portuari i gestió logística de contenidors.
+              Alta costura, vestits de seda i sastreria exclusiva per a home i dona.
             </p>
 
             <p className="text-xs text-slate-400 leading-relaxed">
-              Especialistes en connectar terminals marítimes amb la cadena de subministrament industrial mitjançant transport de contenidors ràpid, segur i personalitzat.
+              Confecció artesanal en llanes Super 150s, caixmir i seda Mulberry des de Passeig de Gràcia amb enviament VIP en porta-trajes arreu d&apos;Europa.
             </p>
 
             <div className="pt-2 text-[11px] text-slate-400 font-mono space-y-1">
               <div>NIF Fictici: {OFFICE_DATA.vatNumber}</div>
-              <div>Acreditació Duanera: {OFFICE_DATA.oeaRegister}</div>
+              <div>Origen Tèxtil: {OFFICE_DATA.oeaRegister}</div>
             </div>
           </div>
 
-          {/* Columna 2 - Enllaços ràpids: 1. Inici 2. Serveis 3. Qui Som 4. Blog 5. Contacte */}
+          {/* Columna 2 - Enllaços ràpids */}
           <div className="space-y-3">
             <h4 className="text-sm font-bold uppercase tracking-wider text-pink-400">
               Enllaços ràpids
@@ -82,7 +82,7 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={() => onNavigate('serveis')}
                   className="hover:text-pink-300 transition-colors"
                 >
-                  Serveis
+                  Col·leccions
                 </button>
               </li>
               <li>
@@ -90,7 +90,15 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={() => onNavigate('simulador-duana')}
                   className="hover:text-pink-300 transition-colors"
                 >
-                  Simulador Duana
+                  Enviament VIP
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('seguiment')}
+                  className="hover:text-pink-300 transition-colors"
+                >
+                  Seguiment d&apos;Enviaments
                 </button>
               </li>
               <li>
@@ -98,7 +106,7 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={() => onNavigate('qui-som')}
                   className="hover:text-pink-300 transition-colors"
                 >
-                  Qui Som
+                  La Maison
                 </button>
               </li>
               <li>
@@ -106,7 +114,7 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={() => onNavigate('blog')}
                   className="hover:text-pink-300 transition-colors"
                 >
-                  Blog
+                  Atelier Journal
                 </button>
               </li>
               <li>
@@ -114,7 +122,7 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={() => onNavigate('contacte')}
                   className="hover:text-pink-300 transition-colors"
                 >
-                  Contacte
+                  Cita &amp; Contacte
                 </button>
               </li>
             </ul>

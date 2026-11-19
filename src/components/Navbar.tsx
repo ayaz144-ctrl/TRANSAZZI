@@ -21,11 +21,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const navItems = [
     { id: 'inici', label: 'Inici' },
-    { id: 'serveis', label: 'Serveis' },
-    { id: 'simulador-duana', label: 'Simulador Duana' },
-    { id: 'qui-som', label: 'Qui Som' },
-    { id: 'blog', label: 'Blog' },
-    { id: 'contacte', label: 'Contacte' },
+    { id: 'serveis', label: 'Col·leccions' },
+    { id: 'simulador-duana', label: 'Enviament VIP' },
+    { id: 'qui-som', label: 'La Maison' },
+    { id: 'blog', label: 'Atelier Journal' },
+    { id: 'contacte', label: 'Cita & Contacte' },
   ];
 
   const handleNavClick = (id: string) => {
@@ -36,7 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-0 z-40 bg-pink-50/95 backdrop-blur-md border-b border-pink-200/90 shadow-xs transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-8 h-20">
+        <div className="flex items-center justify-between gap-6 h-20">
           {/* A dalt a l'esquerra (Logo i Nom): [ Icona de fletxa > ] TRANSAZZI */}
           <div className="flex items-center gap-3 shrink-0">
             <button
@@ -57,8 +57,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </div>
 
-          {/* Menú de Navegació: 1. Inici 2. Serveis 3. Qui Som 4. Blog 5. Contacte (Fons rosa fluix amb text fosc i accent rosa corporatiu) */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-700">
+          {/* Menú de Navegació (Fons rosa fluix amb text fosc i accent rosa corporatiu) */}
+          <nav className="hidden md:flex items-center gap-6 lg:gap-7 text-sm font-semibold text-slate-700">
             {navItems.map((item) => {
               const isActive = activeSection === item.id;
               return (
@@ -80,11 +80,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             })}
           </nav>
 
-          {/* Botó principal al menú: [ Sol·licitar Pressupost ] + Seguiment */}
+          {/* Botó principal al menú + Seguiment */}
           <div className="hidden lg:flex items-center gap-3 shrink-0">
             <button
               onClick={onOpenTrackingModal}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-pink-100/70 border border-pink-200 hover:border-pink-400 rounded-lg shadow-2xs transition-colors whitespace-nowrap shrink-0"
+              className={`inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-lg border shadow-2xs transition-colors whitespace-nowrap shrink-0 ${
+                activeSection === 'seguiment'
+                  ? 'text-pink-700 bg-pink-100 border-pink-400'
+                  : 'text-slate-700 bg-white hover:bg-pink-100/70 border-pink-200 hover:border-pink-400'
+              }`}
             >
               <Compass className="w-3.5 h-3.5 text-pink-600" />
               Seguiment
@@ -94,7 +98,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={onOpenQuoteModal}
               className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-pink-600 hover:bg-pink-500 rounded-lg shadow-md shadow-pink-600/25 hover:shadow-pink-600/40 transition-all whitespace-nowrap shrink-0"
             >
-              Sol·licitar Pressupost
+              Demanar Comanda
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -143,7 +147,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="w-full flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-semibold text-slate-700 bg-white hover:bg-pink-100/80 rounded-lg border border-pink-200 transition-colors"
             >
               <Compass className="w-4 h-4 text-pink-600" />
-              Seguiment de Càrrega
+              Seguiment d&apos;Enviament
             </button>
             <button
               onClick={() => {
@@ -152,7 +156,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }}
               className="w-full flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-semibold text-white bg-pink-600 hover:bg-pink-500 rounded-lg shadow-sm shadow-pink-600/30 transition-colors"
             >
-              Sol·licitar Pressupost
+              Demanar Comanda
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

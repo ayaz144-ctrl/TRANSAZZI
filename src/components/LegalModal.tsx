@@ -40,8 +40,8 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
         <div className="p-4 bg-pink-50/90 border-b border-pink-200 flex items-start gap-3 text-xs text-pink-950">
           <ShieldAlert className="w-4 h-4 text-pink-600 shrink-0 mt-0.5" />
           <div>
-            <strong className="font-semibold block">Nota Informativa d'Àmbit Estudiantil:</strong>
-            Aquest document legal fictici ha estat redactat per a la simulació acadèmica d'una plataforma de logística i comerç exterior en el marc formatiu.
+            <strong className="font-semibold block">Nota Informativa d&apos;Àmbit Estudiantil:</strong>
+            Aquest document legal fictici ha estat redactat per a la simulació acadèmica d&apos;una marca de moda, comerç electrònic i enviaments en el marc formatiu.
           </div>
         </div>
 

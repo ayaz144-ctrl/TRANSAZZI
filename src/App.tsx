@@ -12,6 +12,7 @@ import { ServiceDetailModal } from './components/ServiceDetailModal';
 import { ArticleModal } from './components/ArticleModal';
 import { LegalModal } from './components/LegalModal';
 import { QuoteModal } from './components/QuoteModal';
+import TrackingPage from './app/tracking/page';
 import {
   INITIAL_COMPANY_NAME,
   SERVICES_DATA,
@@ -29,7 +30,16 @@ export default function App() {
     return saved;
   });
 
-  const [activeSection, setActiveSection] = useState<string>('inici');
+  const [currentView, setCurrentView] = useState<'home' | 'tracking'>(() => {
+    return window.location.pathname.startsWith('/tracking') ? 'tracking' : 'home';
+  });
+  const [activeSection, setActiveSection] = useState<string>(() => {
+    return window.location.pathname.startsWith('/tracking') ? 'seguiment' : 'inici';
+  });
+  const [sheetTrackingCode, setSheetTrackingCode] = useState<string>(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('code') || '';
+  });
 
   // Modals state
   const [trackingModalOpen, setTrackingModalOpen] = useState(false);
@@ -50,7 +60,54 @@ export default function App() {
     localStorage.setItem('logistics_company_name', name);
   };
 
+  useEffect(() => {
+    const handlePopState = () => {
+      const isTracking = window.location.pathname.startsWith('/tracking');
+      setCurrentView(isTracking ? 'tracking' : 'home');
+      if (isTracking) {
+        const params = new URLSearchParams(window.location.search);
+        setSheetTrackingCode(params.get('code') || '');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const handleOpenTrackingPage = (code = '') => {
+    const clean = code.trim();
+    setSheetTrackingCode(clean);
+    setCurrentView('tracking');
+    setActiveSection('seguiment');
+    const targetUrl = clean ? `/tracking?code=${encodeURIComponent(clean)}` : '/tracking';
+    if (window.location.pathname + window.location.search !== targetUrl) {
+      window.history.pushState({}, '', targetUrl);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleNavigate = (sectionId: string) => {
+    if (sectionId === 'seguiment') {
+      handleOpenTrackingPage('');
+      return;
+    }
+
+    if (currentView !== 'home') {
+      setCurrentView('home');
+      if (window.location.pathname !== '/') {
+        window.history.pushState({}, '', '/');
+      }
+      setActiveSection(sectionId);
+      setTimeout(() => {
+        if (sectionId === 'inici') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          const el = document.getElementById(sectionId);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 60);
+      return;
+    }
+
     setActiveSection(sectionId);
     if (sectionId === 'inici') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -74,6 +131,10 @@ export default function App() {
 
   // Scroll listener to update active nav tab
   useEffect(() => {
+    if (currentView !== 'home') {
+      return;
+    }
+
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 200;
       const sections = ['contacte', 'blog', 'qui-som', 'simulador-duana', 'serveis', 'inici'];
@@ -96,7 +157,7 @@ export default function App() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [currentView]);
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 font-sans">
@@ -110,23 +171,31 @@ export default function App() {
           setQuotePrefilledService('');
           setQuoteModalOpen(true);
         }}
-        onOpenTrackingModal={() => handleOpenTrackingWithCode('BCN-98234')}
+        onOpenTrackingModal={() => handleOpenTrackingPage('')}
       />
 
       {/* Main Page Flow */}
       <main className="flex-1">
-        {/* Section 1: Hero Section */}
-        <div id="inici">
-          <Hero
-            companyName={companyName}
-            onOpenQuoteModal={() => {
-              setQuotePrefilledService('');
-              setQuoteModalOpen(true);
-            }}
-            onNavigateToServices={() => handleNavigate('serveis')}
-            onSearchTracking={handleOpenTrackingWithCode}
+        {currentView === 'tracking' ? (
+          <TrackingPage
+            initialCode={sheetTrackingCode}
+            onBackHome={() => handleNavigate('inici')}
           />
-        </div>
+        ) : (
+          <>
+            {/* Section 1: Hero Section */}
+            <div id="inici">
+              <Hero
+                companyName={companyName}
+                onOpenQuoteModal={() => {
+                  setQuotePrefilledService('');
+                  setQuoteModalOpen(true);
+                }}
+                onNavigateToServices={() => handleNavigate('serveis')}
+                onSearchTracking={handleOpenTrackingWithCode}
+                onOpenTrackingPage={handleOpenTrackingPage}
+              />
+            </div>
 
         {/* Section 2: Services / Catalogue (3 Detailed Cards + Calculator) */}
         <ServicesSection
@@ -155,6 +224,8 @@ export default function App() {
           companyName={companyName}
           prefilledService={quotePrefilledService}
         />
+          </>
+        )}
       </main>
 
       {/* Dark Corporate Footer */}
@@ -174,7 +245,7 @@ export default function App() {
 
       {quoteModalOpen && (
         <QuoteModal
-          initialService={quotePrefilledService || 'Transport Marítim & Multimodal Internacional'}
+          initialService={quotePrefilledService || "Vestits d'Alta Costura & Gala"}
           onClose={() => setQuoteModalOpen(false)}
         />
       )}
